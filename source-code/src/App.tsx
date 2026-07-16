@@ -1,49 +1,62 @@
-import { useState, useCallback } from "react";
+import { createSignal, onMount, For, Show } from "solid-js";
+import { invoke } from "@tauri-apps/api/core";
 import GamesTab from "./components/GamesTab";
 import ProtonsTab from "./components/ProtonsTab";
-import SettingsTab from "./components/SettingsTab";
+import ControllersTab from "./components/ControllersTab";
+import SettingsTab, { applyTheme } from "./components/SettingsTab";
 import AboutTab from "./components/AboutTab";
 import ToastContainer from "./components/ToastContainer";
-import { Toast } from "./types";
+import { Toast, Settings } from "./types";
 
-type Tab = "Games" | "Protons" | "Settings" | "About";
-const TABS: Tab[] = ["Games", "Protons", "Settings", "About"];
+type Tab = "Games" | "Protons" | "Controllers" | "Settings" | "About";
+const TABS: Tab[] = ["Games", "Protons", "Controllers", "Settings", "About"];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>("Games");
-  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [activeTab, setActiveTab] = createSignal<Tab>("Games");
+  const [toasts, setToasts] = createSignal<Toast[]>([]);
+  // Read once at startup: changing "Library View" in Settings takes effect
+  // after restarting the app, rather than reflowing the list mid-session.
+  const [libraryView, setLibraryView] = createSignal<"List" | "Grid">("List");
 
-  const addToast = useCallback(
-    (message: string, kind: Toast["kind"] = "info") => {
-      const id = Date.now();
-      setToasts((t) => [...t, { id, message, kind }]);
-      setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000);
-    },
-    []
-  );
+  const addToast = (message: string, kind: Toast["kind"] = "info") => {
+    const id = Date.now();
+    setToasts((t) => [...t, { id, message, kind }]);
+    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000);
+  };
+
+  onMount(() => {
+    invoke<Settings>("get_settings")
+      .then((s) => {
+        applyTheme(s.theme);
+        setLibraryView(s.library_view === "Grid" ? "Grid" : "List");
+      })
+      .catch(() => {});
+  });
 
   return (
-    <div className="app">
-      <nav className="tab-bar">
-        {TABS.map((tab) => (
-          <button
-            key={tab}
-            className={`tab-btn ${activeTab === tab ? "active" : ""}`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
+    <div class="app">
+      <nav class="tab-bar">
+        <For each={TABS}>
+          {(tab) => (
+            <button
+              class={`tab-btn ${activeTab() === tab ? "active" : ""}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </button>
+          )}
+        </For>
       </nav>
 
-      <div className="tab-content">
-        {activeTab === "Games" && <GamesTab addToast={addToast} />}
-        {activeTab === "Protons" && <ProtonsTab addToast={addToast} />}
-        {activeTab === "Settings" && <SettingsTab addToast={addToast} />}
-        {activeTab === "About" && <AboutTab />}
+      <div class="tab-content">
+        <Show when={activeTab() === "Games"}><GamesTab addToast={addToast} libraryView={libraryView()} /></Show>
+        <Show when={activeTab() === "Protons"}><ProtonsTab addToast={addToast} /></Show>
+        <Show when={activeTab() === "Controllers"}><ControllersTab addToast={addToast} /></Show>
+        <Show when={activeTab() === "Settings"}><SettingsTab addToast={addToast} /></Show>
+        <Show when={activeTab() === "About"}><AboutTab /></Show>
       </div>
 
-      <ToastContainer toasts={toasts} />
+      <ToastContainer toasts={toasts()} />
     </div>
   );
 }
