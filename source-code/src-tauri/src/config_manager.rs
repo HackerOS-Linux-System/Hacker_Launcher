@@ -19,6 +19,17 @@ pub struct Settings {
     pub enable_dxvk_async: bool,
     #[serde(default = "default_theme")]
     pub theme: String,
+    /// When true, games with `use_shared_prefix` set will all share the
+    /// single prefix at `shared_prefix_path` instead of getting their own.
+    #[serde(default)]
+    pub use_shared_prefix_default: bool,
+    /// Empty means "use `<prefixes_dir>/shared`" (computed by GameManager).
+    #[serde(default)]
+    pub shared_prefix_path: String,
+    /// "List" or "Grid". Read once at app startup by the frontend, so
+    /// changing it takes effect after restarting the app.
+    #[serde(default = "default_library_view")]
+    pub library_view: String,
 }
 
 fn default_runner() -> String {
@@ -33,6 +44,9 @@ fn default_true() -> bool {
 fn default_theme() -> String {
     "Dark (Default)".to_string()
 }
+fn default_library_view() -> String {
+    "List".to_string()
+}
 
 impl Default for Settings {
     fn default() -> Self {
@@ -44,6 +58,9 @@ impl Default for Settings {
             enable_fsync: true,
             enable_dxvk_async: false,
             theme: default_theme(),
+            use_shared_prefix_default: false,
+            shared_prefix_path: String::new(),
+            library_view: default_library_view(),
         }
     }
 }
