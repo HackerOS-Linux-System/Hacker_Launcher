@@ -1,7 +1,3 @@
-/* ============================================
-   HACKER LAUNCHER — Glassmorphism Theme
-   ============================================ */
-
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -42,6 +38,50 @@
 
   --font: "Segoe UI", "SF Pro Display", "Ubuntu", sans-serif;
 }
+
+/* ── Light theme ─────────────────────────────
+   Applied via <html data-theme="light">, toggled at runtime from
+   Settings > Appearance > Theme (no restart needed). */
+html[data-theme="light"] {
+  --bg-deep: #f3f2fa;
+  --bg-panel: rgba(255, 255, 255, 0.9);
+  --bg-surface: rgba(20, 10, 40, 0.03);
+  --bg-input: rgba(20, 10, 40, 0.04);
+  --bg-table: rgba(255, 255, 255, 0.85);
+
+  --accent: rgba(124, 58, 237, 1);
+  --accent-light: rgba(109, 40, 217, 1);
+  --accent-dim: rgba(124, 58, 237, 0.18);
+  --accent-hover: rgba(124, 58, 237, 0.35);
+  --accent-border: rgba(124, 58, 237, 0.25);
+  --accent-border-focus: rgba(109, 40, 217, 0.6);
+
+  --text-primary: #201a33;
+  --text-secondary: rgba(60, 40, 100, 0.85);
+  --text-muted: rgba(70, 60, 100, 0.55);
+  --text-dim: rgba(70, 60, 100, 0.4);
+
+  --danger: rgba(220, 38, 38, 0.12);
+  --danger-border: rgba(220, 38, 38, 0.35);
+  --danger-text: #b91c1c;
+  --danger-hover: rgba(220, 38, 38, 0.2);
+
+  --border-subtle: rgba(124, 58, 237, 0.15);
+  --border-medium: rgba(124, 58, 237, 0.28);
+}
+
+html[data-theme="light"] body {
+  background-image: radial-gradient(ellipse at 20% 20%, rgba(124,58,237,0.05) 0%, transparent 60%),
+                    radial-gradient(ellipse at 80% 80%, rgba(109,40,217,0.04) 0%, transparent 60%);
+}
+
+html[data-theme="light"] .modal { background: #ffffff; }
+html[data-theme="light"] .about-text,
+html[data-theme="light"] pre { background: rgba(20,10,40,0.03); color: #2a2440; }
+html[data-theme="light"] select option { background: #ffffff; color: var(--text-primary); }
+html[data-theme="light"] .toast { background: #ffffff; }
+html[data-theme="light"] tbody td { color: #2a2440; }
+html[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.25); }
 
 html, body, #root {
   height: 100%;
@@ -162,6 +202,8 @@ thead th {
 
 thead th:first-child { border-radius: var(--radius-lg) 0 0 0; }
 thead th:last-child  { border-radius: 0 var(--radius-lg) 0 0; }
+
+thead th.sortable:hover { color: #fff; background: rgba(138,92,246,0.25); }
 
 tbody tr {
   cursor: pointer;
@@ -321,7 +363,27 @@ select:focus {
   color: #fff;
 }
 
-input::placeholder { color: var(--text-dim); font-style: italic; }
+textarea {
+  background: var(--bg-input);
+  border: 1px solid var(--accent-border);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-family: var(--font);
+  width: 100%;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+textarea:focus {
+  border-color: var(--accent-border-focus);
+  background: rgba(138,92,246,0.08);
+  color: #fff;
+}
+
+input::placeholder, textarea::placeholder { color: var(--text-dim); font-style: italic; }
 
 select {
   appearance: none;
@@ -562,3 +624,140 @@ select option {
 .badge-green  { background: rgba(74,222,128,0.15); color: #86efac; border: 1px solid rgba(74,222,128,0.3); }
 .badge-yellow { background: rgba(250,204,21,0.15);  color: #fde047; border: 1px solid rgba(250,204,21,0.3); }
 .badge-purple { background: rgba(138,92,246,0.2);   color: #c4b5fd; border: 1px solid rgba(138,92,246,0.35); }
+.badge-red    { background: rgba(220,38,38,0.15);   color: #fca5a5; border: 1px solid rgba(220,38,38,0.3); }
+.badge-gray   { background: rgba(148,148,180,0.12); color: var(--text-muted); border: 1px solid rgba(148,148,180,0.2); }
+
+/* ── Favorite star ──────────────────────────── */
+.star-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  color: rgba(148,148,180,0.4);
+  transition: color 0.15s, transform 0.15s;
+}
+.star-btn:hover { color: #fde047; transform: scale(1.15); }
+.star-btn.active { color: #fde047; }
+
+/* ── Drag & drop overlay ────────────────────── */
+.dropzone-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(124,58,237,0.15);
+  backdrop-filter: blur(2px);
+  border: 3px dashed rgba(167,139,250,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.dropzone-overlay span {
+  background: rgba(20,10,40,0.85);
+  color: #fff;
+  padding: 16px 28px;
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ── Grid / tile view ───────────────────────── */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+  padding: 4px;
+}
+
+.game-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.game-card:hover {
+  border-color: var(--accent-border);
+  background: rgba(138,92,246,0.08);
+}
+
+.game-card.selected {
+  border-color: rgba(167,139,250,0.8);
+  background: linear-gradient(160deg, rgba(138,92,246,0.25) 0%, rgba(109,40,217,0.15) 100%);
+}
+
+.game-card .cover {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  background: rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+
+.game-card .card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-card .card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.game-card .running-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 6px rgba(74,222,128,0.8);
+}
+
+/* ── Collapsible section (Configure modal) ──── */
+.collapsible {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.collapsible summary {
+  cursor: pointer;
+  color: var(--accent-light);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 0;
+  list-style: none;
+}
+.collapsible summary::-webkit-details-marker { display: none; }
+.collapsible summary::before { content: "▸ "; }
+.collapsible[open] summary::before { content: "▾ "; }
+
+.collapsible-body {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 10px 12px;
+  align-items: center;
+  padding-top: 8px;
+}
