@@ -1,7 +1,7 @@
 {
   "productName": "Hacker Launcher",
   "mainBinaryName": "Hacker_Launcher",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "identifier": "com.hackeros.hacker-launcher",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -11,7 +11,11 @@
   },
   "app": {
     "security": {
-      "csp": null
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["**"]
+      }
     },
     "windows": [
       {
